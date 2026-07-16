@@ -77,13 +77,58 @@ export function summarize(transactions: Transaction[]): CashSummary {
 /** Ringkasan kas minggu ini (data tiruan sudah berada dalam rentang minggu berjalan). */
 export const weeklySummary: CashSummary = summarize(mockTransactions);
 
+export type Period = "daily" | "weekly" | "monthly";
+
+export const periodLabels: Record<Period, string> = {
+  daily: "Harian",
+  weekly: "Mingguan",
+  monthly: "Bulanan",
+};
+
+/**
+ * Batas awal rentang untuk sebuah periode, relatif terhadap `ref`:
+ * - daily   → awal hari ini
+ * - weekly  → 7 hari terakhir
+ * - monthly → awal bulan ini
+ */
+function periodStart(period: Period, ref: Date): Date {
+  const d = new Date(ref);
+  if (period === "daily") {
+    d.setHours(0, 0, 0, 0);
+  } else if (period === "weekly") {
+    d.setDate(d.getDate() - 6);
+    d.setHours(0, 0, 0, 0);
+  } else {
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+  }
+  return d;
+}
+
+/** Saring transaksi sesuai periode terpilih (relatif ke `ref`, default sekarang). */
+export function filterByPeriod(
+  transactions: Transaction[],
+  period: Period,
+  ref: Date = new Date()
+): Transaction[] {
+  const start = periodStart(period, ref).getTime();
+  const end = ref.getTime();
+  return transactions.filter((t) => {
+    const time = new Date(t.transactionDate).getTime();
+    return time >= start && time <= end;
+  });
+}
+
 export interface BranchRecap extends CashSummary {
   branch: Branch;
 }
 
-/** Transaksi terbaru dari semua cabang, terbaru lebih dulu. */
-export function recentTransactions(limit = 5): Transaction[] {
-  return [...mockTransactions]
+/** Transaksi terbaru dari daftar (default: semua data tiruan), terbaru lebih dulu. */
+export function recentTransactions(
+  transactions: Transaction[] = mockTransactions,
+  limit = 5
+): Transaction[] {
+  return [...transactions]
     .sort(
       (a, b) =>
         new Date(b.transactionDate).getTime() -
@@ -92,11 +137,13 @@ export function recentTransactions(limit = 5): Transaction[] {
     .slice(0, limit);
 }
 
-/** Rekap kas per cabang untuk membandingkan performa tiap cabang. */
-export function branchRecaps(): BranchRecap[] {
+/** Rekap kas per cabang dari daftar transaksi (default: semua data tiruan). */
+export function branchRecaps(
+  transactions: Transaction[] = mockTransactions
+): BranchRecap[] {
   return mockBranches
     .map((branch) => {
-      const txs = mockTransactions.filter((t) => t.branchId === branch.id);
+      const txs = transactions.filter((t) => t.branchId === branch.id);
       return { branch, ...summarize(txs) };
     })
     .sort((a, b) => b.balance - a.balance);

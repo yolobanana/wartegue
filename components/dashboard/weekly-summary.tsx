@@ -3,14 +3,20 @@ import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
 import type { CashSummary } from "@/lib/types";
 import { StatCard } from "./stat-card";
 
-// Ringkasan Mingguan — total pemasukan, pengeluaran, dan selisih kas minggu ini
+// Ringkasan — total pemasukan, pengeluaran, dan selisih kas pada periode terpilih
 // dalam satu baris kartu statistik.
-export function WeeklySummary({ summary }: { summary: CashSummary }) {
+export function WeeklySummary({
+  summary,
+  periodLabel = "Minggu Ini",
+}: {
+  summary: CashSummary;
+  periodLabel?: string;
+}) {
   return (
     <section className="space-y-3">
       <div className="flex items-baseline justify-between">
         <h3 className="text-sm font-semibold text-muted-foreground">
-          Ringkasan Minggu Ini
+          Ringkasan {periodLabel}
         </h3>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
