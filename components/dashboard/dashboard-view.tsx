@@ -11,6 +11,9 @@ import {
   summarize,
   type Period,
 } from "@/lib/mock-data";
+import { CalendarOff } from "lucide-react";
+
+import { Card, CardContent } from "@/components/ui/card";
 import { WeeklySummary } from "./weekly-summary";
 import { BranchRecapList } from "./branch-recap";
 import { RecentTransactions } from "./recent-transactions";
@@ -39,7 +42,7 @@ export function DashboardView({
         <div>
           <h2 className="text-xl font-semibold tracking-tight">Ringkasan Kas</h2>
           <p className="text-sm text-muted-foreground">
-            Pantau arus kas seluruh cabang warteg dalam satu layar.
+            {filtered.length} transaksi · periode {periodLabels[period].toLowerCase()}
           </p>
         </div>
         <PeriodFilter value={period} onChange={setPeriod} />
@@ -47,9 +50,23 @@ export function DashboardView({
 
       <WeeklySummary summary={summary} periodLabel={periodLabels[period]} />
 
-      <BranchRecapList recaps={recaps} />
-
-      <RecentTransactions transactions={recent} />
+      {filtered.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
+            <CalendarOff className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm font-medium">Belum ada transaksi</p>
+            <p className="text-sm text-muted-foreground">
+              Tidak ada data untuk periode {periodLabels[period].toLowerCase()}.
+              Coba ganti filter waktu.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <BranchRecapList recaps={recaps} />
+          <RecentTransactions transactions={recent} />
+        </>
+      )}
     </div>
   );
 }
