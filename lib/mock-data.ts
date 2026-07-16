@@ -76,3 +76,17 @@ export function summarize(transactions: Transaction[]): CashSummary {
 
 /** Ringkasan kas minggu ini (data tiruan sudah berada dalam rentang minggu berjalan). */
 export const weeklySummary: CashSummary = summarize(mockTransactions);
+
+export interface BranchRecap extends CashSummary {
+  branch: Branch;
+}
+
+/** Rekap kas per cabang untuk membandingkan performa tiap cabang. */
+export function branchRecaps(): BranchRecap[] {
+  return mockBranches
+    .map((branch) => {
+      const txs = mockTransactions.filter((t) => t.branchId === branch.id);
+      return { branch, ...summarize(txs) };
+    })
+    .sort((a, b) => b.balance - a.balance);
+}

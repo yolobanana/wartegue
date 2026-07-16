@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
-import { weeklySummary } from "@/lib/mock-data";
+import { BranchRecapList } from "@/components/dashboard/branch-recap";
+import { branchRecaps, weeklySummary } from "@/lib/mock-data";
 
 export default function DashboardPage() {
   return (
@@ -15,7 +16,9 @@ export default function DashboardPage() {
 
         <WeeklySummary summary={weeklySummary} />
 
-        {/* Rekap cabang, filter waktu, dan riwayat transaksi diisi pada task berikutnya. */}
+        <BranchRecapList recaps={branchRecaps()} />
+
+        {/* Filter waktu dan riwayat transaksi diisi pada task berikutnya. */}
       </div>
     </AppShell>
   );
