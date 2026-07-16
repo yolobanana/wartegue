@@ -81,6 +81,17 @@ export interface BranchRecap extends CashSummary {
   branch: Branch;
 }
 
+/** Transaksi terbaru dari semua cabang, terbaru lebih dulu. */
+export function recentTransactions(limit = 5): Transaction[] {
+  return [...mockTransactions]
+    .sort(
+      (a, b) =>
+        new Date(b.transactionDate).getTime() -
+        new Date(a.transactionDate).getTime()
+    )
+    .slice(0, limit);
+}
+
 /** Rekap kas per cabang untuk membandingkan performa tiap cabang. */
 export function branchRecaps(): BranchRecap[] {
   return mockBranches
